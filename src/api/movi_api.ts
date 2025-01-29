@@ -15,7 +15,19 @@ export const movieApi = createApi({
           method: "GET",
         }),
       }),
+      getSpecificMovieData: builder.query({
+        query: (movieId) => ({
+          url: `movie/${movieId}?language=en-US&api_key=${apiKey}`,
+          method: "GET",
+        }),
+      }),
+      getMovieSearchInput: builder.query({
+        query: (movie) => ({
+          url: `search/movie?query=${movie}&include_adult=false&language=en-US&page=1&api_key=${apiKey}`,
+          method: "GET",
+        }),
+      }),
     }),
   });
 //Url to retrieve images.. https://image.tmdb.org/t/p/w500/1E5baAaEse26fej7uHcjOgEE2t2.jpg
-export const { useGetMoviesListQuery } = movieApi;
+export const { useGetMoviesListQuery,useLazyGetSpecificMovieDataQuery,useLazyGetMovieSearchInputQuery } = movieApi;
