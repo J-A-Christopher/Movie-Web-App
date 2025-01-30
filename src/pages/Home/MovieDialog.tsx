@@ -21,7 +21,7 @@ export default function MovieDialog({
 }: MovieDialogProps) {
   return (
     <Dialog open={isMovieDialogOpen} onOpenChange={onMovieDialogOpen}>
-      <DialogContent className="max-w-4xl p-0 overflow-hidden mx-4 sm:mx-8 md:mx-12 my-6 sm:my-8">
+      <DialogContent className="w-full max-w-[95%] sm:max-w-4xl p-0 overflow-hidden mx-auto my-6 sm:my-8 rounded-lg">
         <div
           className="relative h-[300px] md:h-[500px] lg:h-[600px] w-full bg-cover bg-center rounded-lg"
           style={{
@@ -50,7 +50,7 @@ export default function MovieDialog({
                 </div>
               </div>
               <DialogDescription className="text-sm sm:text-base md:text-lg text-white">
-                {individualMData.overview ===''? 'No overview available': individualMData.overview}   
+                {individualMData.overview === '' ? 'No overview available' : individualMData.overview}   
               </DialogDescription>
             </DialogHeader>
           </div>

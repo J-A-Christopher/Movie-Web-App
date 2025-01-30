@@ -8,16 +8,23 @@ import MovieDialog from "./MovieDialog";
 import { useLazyGetSpecificMovieDataQuery } from "@/api/movi_api";
 import { useLazyGetMovieSearchInputQuery } from "@/api/movi_api";
 import pholder from "../../assets/pholder.jpg";
+import Pagination from "./Pagination";
 
 export default function HomePage() {
-  const [scrollOpacity, setScrollOpacity] = useState(1);
-  const { isError, error, data, isLoading } = useGetMoviesListQuery({});
+  const [scrollOpacity, setScrollOpacity] = useState<number>(1);
+  const [lastSearchTerm, setLastSearchTerm] = useState<string>("");
   const [movieData, setMovieData] = useState<Movie[]>();
   const [searchMovieData, setSearchMovieData] = useState<Movie[]>();
   const [individuLMData, setIndividualMovieData] =
     useState<SpecificMovieData>();
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [searchCurrentPage, setSearchCurrentPage] = useState<number>(1);
+  const [searchTotalPages, setTotalSearchPages] = useState<number>(1);
   const [isMovieDialogOpen, setMovieDialogOpen] = useState<boolean>();
   const [searchInput, setSearchInput] = useState<string | undefined>();
+  const { isError, error, data, isLoading } =
+    useGetMoviesListQuery(currentPage);
   const [
     getSpecificMovieData,
     {
@@ -36,8 +43,6 @@ export default function HomePage() {
     },
   ] = useLazyGetMovieSearchInputQuery();
 
-  console.log(searchMovieData);
-
   useEffect(() => {
     if (isSearchError) {
       errorHandler(searchError);
@@ -47,6 +52,7 @@ export default function HomePage() {
   useEffect(() => {
     if (data) {
       setMovieData(data?.results);
+      setTotalPages(data?.total_pages);
     }
   }, [data]);
 
@@ -59,6 +65,7 @@ export default function HomePage() {
   useEffect(() => {
     if (searchData) {
       setSearchMovieData(searchData?.results);
+      setTotalSearchPages(searchData?.total_pages);
     }
   }, [searchData]);
 
@@ -79,9 +86,28 @@ export default function HomePage() {
   };
 
   const searchHandler = async () => {
-    await getSearchData(searchInput);
+    if (!searchInput) return;
+    setSearchCurrentPage(1);
+    setLastSearchTerm(searchInput);
+    await getSearchData({ movie: searchInput, page: 1 });
     setSearchInput("");
   };
+
+  const handleSearchPageChange = async (newPage: number) => {
+    setSearchCurrentPage(newPage);
+    await getSearchData({ movie: lastSearchTerm, page: newPage });
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  useEffect(() => {
+    if (searchData) {
+      setSearchMovieData(searchData.results);
+      setTotalSearchPages(searchData.total_pages);
+    }
+  }, [searchData]);
 
   useEffect(() => {
     if (isError) {
@@ -177,31 +203,33 @@ export default function HomePage() {
                 </h1>
               </div>
             ) : (
-              searchMovieData?.map((movie: Movie) => (
-                <div
-                  key={movie.id}
-                  className="relative group cursor-pointer transition-transform duration-200 hover:scale-105"
-                  onClick={() => specificMovieDataHandler(movie.id)}
-                >
-                  <img
-                    src={
-                      movie.poster_path === null
-                        ? pholder
-                        : `https://image.tmdb.org/t/p/w500/${movie.poster_path}`
-                    }
-                    alt={movie.title}
-                    className="w-full aspect-[2/3] object-cover rounded-md"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-md">
-                    <div className="absolute bottom-0 p-4">
-                      <h3 className="text-sm font-semibold">{movie.title}</h3>
-                      <p className="text-xs text-gray-300">
-                        {movie.release_date}
-                      </p>
+              <>
+                {searchMovieData?.map((movie: Movie) => (
+                  <div
+                    key={movie.id}
+                    className="relative group cursor-pointer transition-transform duration-200 hover:scale-105"
+                    onClick={() => specificMovieDataHandler(movie.id)}
+                  >
+                    <img
+                      src={
+                        movie.poster_path === null
+                          ? pholder
+                          : `https://image.tmdb.org/t/p/w500/${movie.poster_path}`
+                      }
+                      alt={movie.title}
+                      className="w-full aspect-[2/3] object-cover rounded-md"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-md">
+                      <div className="absolute bottom-0 p-4">
+                        <h3 className="text-sm font-semibold">{movie.title}</h3>
+                        <p className="text-xs text-gray-300">
+                          {movie.release_date}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))
+                ))}
+              </>
             )}
           </div>
         </div>
@@ -211,6 +239,28 @@ export default function HomePage() {
           isMovieDialogOpen={isMovieDialogOpen}
           onMovieDialogOpen={setMovieDialogOpen}
           individualMData={individuLMData}
+        />
+      )}
+      {movieData && searchMovieData === undefined && (
+        <Pagination
+          currentPage={currentPage}
+          onPageChange={(page) => {
+            setCurrentPage(page);
+            window.scrollTo({
+              top: 0,
+              behavior: "smooth",
+            });
+          }}
+          totalPages={totalPages}
+          isLoading={isLoading}
+        />
+      )}
+      {searchMovieData && searchMovieData.length > 0 && (
+        <Pagination
+          currentPage={searchCurrentPage}
+          onPageChange={handleSearchPageChange}
+          totalPages={searchTotalPages}
+          isLoading={isSearchLoading}
         />
       )}
     </>

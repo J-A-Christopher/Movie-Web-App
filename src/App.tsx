@@ -8,6 +8,8 @@ import { useToast } from "./hooks/use-toast";
 import { ToastAction } from "./components/ui/toast";
 import { clearError } from "./state/slices/errorSlice";
 import { Toaster } from "./components/ui/toaster";
+import LoginPage from "./pages/login/login_page";
+import SignUp from "./pages/SignUp/SignUp";
 
 function App() {
   const dispatch = useDispatch();
@@ -38,7 +40,9 @@ function App() {
       <Toaster />
       <Router>
         <Routes>
-          <Route path="/" element={<HomePage />}></Route>
+          <Route path="/" element={<LoginPage />}></Route>
+          <Route path="/sign-up" element={<SignUp />}></Route>
+          <Route path="/home" element={<HomePage />}></Route>
         </Routes>
       </Router>
     </>
