@@ -10,8 +10,8 @@ export const movieApi = createApi({
     }),
     endpoints: (builder) => ({
       getMoviesList: builder.query({
-        query: () => ({
-          url: `movie/top_rated?language=en-US&page=1&api_key=${apiKey}`,
+        query: (currentPage) => ({
+          url: `movie/top_rated?language=en-US&page=${currentPage}&api_key=${apiKey}`,
           method: "GET",
         }),
       }),
@@ -22,8 +22,8 @@ export const movieApi = createApi({
         }),
       }),
       getMovieSearchInput: builder.query({
-        query: (movie) => ({
-          url: `search/movie?query=${movie}&include_adult=false&language=en-US&page=1&api_key=${apiKey}`,
+        query: ({movie,page}) => ({
+          url: `search/movie?query=${movie}&include_adult=false&language=en-US&page=${page}&api_key=${apiKey}`,
           method: "GET",
         }),
       }),
