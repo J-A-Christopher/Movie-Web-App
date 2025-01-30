@@ -9,8 +9,18 @@ import { useLazyGetSpecificMovieDataQuery } from "@/api/movi_api";
 import { useLazyGetMovieSearchInputQuery } from "@/api/movi_api";
 import pholder from "../../assets/pholder.jpg";
 import Pagination from "./Pagination";
+import { Button } from "@/components/ui/button";
+import { LogOut } from "lucide-react";
+import { logout } from "@/state/slices/authSlice";
+import { signOut } from "firebase/auth";
+import { auth } from "@/firebase/firebase";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setError } from "@/state/slices/errorSlice";
 
 export default function HomePage() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [scrollOpacity, setScrollOpacity] = useState<number>(1);
   const [lastSearchTerm, setLastSearchTerm] = useState<string>("");
   const [movieData, setMovieData] = useState<Movie[]>();
@@ -128,10 +138,26 @@ export default function HomePage() {
   if (isSearchLoading) {
     return <MovieGridShimmer />;
   }
+  const handleLogout = async() => {
+    try {
+      await signOut(auth);
+      dispatch(logout());
+      navigate('/', { replace: true });
+    } catch (error) {
+      console.error('Logout error:', error);
+      dispatch(setError((error as Error).message));
+    }
+  };
 
   return (
     <>
-      <div className="min-h-screen bg-black text-white">
+      <div className="min-h-screen bg-black text-white relative">
+        <Button
+          className="absolute top-4 right-6 sm:top-6 sm:right-10 flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-md transition-all z-50"
+          onClick={handleLogout}
+        >
+          <LogOut size={20} /> Logout
+        </Button>
         <div
           className="relative h-screen flex items-center justify-center"
           style={{
