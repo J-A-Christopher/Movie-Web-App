@@ -20,3 +20,37 @@ export interface SpecificMovieData {
     }
   ];
 }
+
+export interface User {
+  uid: string;
+  email: string | null;
+  displayName: string | null;
+}
+
+export interface AuthState {
+  user: User | null;
+  loading: boolean;
+  error: string | null;
+}
+
+export interface FormData {
+  email: string;
+  password: string;
+  username: string;
+}
+
+export interface FormErrors {
+  email?: string;
+  password?: string;
+  username?: string;
+}
+
+export interface LoginFormData {
+  email: string;
+  password: string;
+}
+
+export interface LoginFormErrors {
+  email?: string;
+  password?: string;
+}

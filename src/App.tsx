@@ -10,6 +10,8 @@ import { clearError } from "./state/slices/errorSlice";
 import { Toaster } from "./components/ui/toaster";
 import LoginPage from "./pages/login/login_page";
 import SignUp from "./pages/SignUp/SignUp";
+import { AuthProvider } from "./components/AuthProvider";
+import { ProtectedRoute } from "./protected/ProtectedRoute";
 
 function App() {
   const dispatch = useDispatch();
@@ -35,17 +37,25 @@ function App() {
       });
     }
   }, [dispatch, errors, toast]);
+
   return (
-    <>
-      <Toaster />
-      <Router>
+    <Router>
+      <AuthProvider>
+        <Toaster />
         <Routes>
-          <Route path="/" element={<LoginPage />}></Route>
-          <Route path="/sign-up" element={<SignUp />}></Route>
-          <Route path="/home" element={<HomePage />}></Route>
+          <Route path="/" element={<LoginPage />} />
+          <Route path="/sign-up" element={<SignUp />} />
+          <Route
+            path="/home"
+            element={
+              <ProtectedRoute>
+                <HomePage />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
-      </Router>
-    </>
+      </AuthProvider>
+    </Router>
   );
 }
 
