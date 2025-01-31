@@ -63,4 +63,35 @@ export const handleGoogleSignUp = async (navigate: NavigateFunction) => {
       errors.username = "Username is required";
     }
     return errors;
-  };
+ };
+  
+
+ export const getPageNumbers = (currentPage:number,totalPages:number) => {
+  const delta = 1;
+  const range = [];
+  const rangeWithDots = [];
+
+  for (
+    let i = Math.max(2, currentPage - delta);
+    i <= Math.min(totalPages - 1, currentPage + delta);
+    i++
+  ) {
+    range.push(i);
+  }
+
+  if (currentPage - delta > 2) {
+    rangeWithDots.push(1, "...");
+  } else {
+    rangeWithDots.push(1);
+  }
+
+  rangeWithDots.push(...range);
+
+  if (currentPage + delta < totalPages - 1) {
+    rangeWithDots.push("...", totalPages);
+  } else if (totalPages > 1) {
+    rangeWithDots.push(totalPages);
+  }
+
+  return rangeWithDots;
+};
