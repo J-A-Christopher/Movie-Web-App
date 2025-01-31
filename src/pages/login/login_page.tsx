@@ -11,6 +11,7 @@ import { Separator } from "../../components/ui/separator";
 import cinema from "../../assets/cinema.jpg";
 import { RootState } from "@/state/slices/types";
 import { useEffect } from "react";
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ export default function LoginPage() {
   const { loading, error, user } = useSelector(
     (state: RootState) => state.auth
   );
+  
   useEffect(() => {
     if (user && !loading) {
       navigate("/home", { replace: true });
@@ -57,6 +59,31 @@ export default function LoginPage() {
       errors.password = "Password is required";
     }
     return errors;
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      dispatch(setLoading(true));
+      const provider = new GoogleAuthProvider();
+      const userCredential = await signInWithPopup(auth, provider);
+
+      dispatch(
+        setUser({
+          uid: userCredential.user.uid,
+          email: userCredential.user.email,
+          displayName: userCredential.user.displayName,
+        })
+      );
+
+      navigate("/home", { replace: true });
+    } catch (error) {
+      const errorMessage = (error as Error).message;
+      const errorCode =
+        errorMessage.match(/\(auth\/(.+?)\)/)?.[1] || "unknown-error";
+      dispatch(setError(errorCode));
+    } finally {
+      dispatch(setLoading(false));
+    }
   };
 
   const submitHandler = async (e: FormEvent<HTMLFormElement>) => {
@@ -158,6 +185,16 @@ export default function LoginPage() {
                 OR
               </span>
             </div>
+
+            <Button
+              type="button"
+              onClick={handleGoogleSignIn}
+              disabled={loading}
+              className="w-full h-12 bg-zinc-800 hover:bg-zinc-700 text-white text-lg flex items-center justify-center gap-2"
+            >
+              <span className="text-2xl font-bold">G</span>
+              Sign in with Google
+            </Button>
           </div>
 
           <div className="text-lg text-zinc-400">
