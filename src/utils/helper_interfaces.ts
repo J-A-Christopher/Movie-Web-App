@@ -3,7 +3,7 @@ export interface Movie {
   title: string;
   poster_path?: string;
   release_date: string;
-  popularity: string;
+  popularity: number;
   overview: string;
 }
 
@@ -13,6 +13,7 @@ export interface SpecificMovieData {
   overview: string;
   vote_average: number;
   release_date: string;
+  popularity: number;
   genres: [
     {
       id: number;

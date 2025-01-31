@@ -10,6 +10,7 @@ import { Button } from "../../components/ui/button";
 import { Separator } from "../../components/ui/separator";
 import { Input } from "../../components/ui/input";
 import cinema from "../../assets/cinema.jpg";
+import { handleGoogleSignUp, validateForm } from "@/utils/helper_functions";
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -39,27 +40,9 @@ export default function SignUp() {
     }
   };
 
-  const validateForm = (): FormErrors => {
-    const errors: FormErrors = {};
-    if (!formData.email.trim()) {
-      errors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      errors.email = "Email is invalid";
-    }
-    if (!formData.password.trim()) {
-      errors.password = "Password is required";
-    } else if (formData.password.length < 6) {
-      errors.password = "Password must be at least 6 characters";
-    }
-    if (!formData.username.trim()) {
-      errors.username = "Username is required";
-    }
-    return errors;
-  };
-
   const submitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const errors = validateForm();
+    const errors = validateForm(formData);
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
       return;
@@ -85,8 +68,10 @@ export default function SignUp() {
 
       navigate("/", { replace: true });
     } catch (error) {
-        console.log(error);
-      dispatch(setError((error as Error).message));
+      const errorMessage = (error as Error).message;
+      const errorCode =
+        errorMessage.match(/\(auth\/(.+?)\)/)?.[1] || "unknown-error";
+      dispatch(setError(errorCode));
     }
   };
 
@@ -171,6 +156,16 @@ export default function SignUp() {
                 OR
               </span>
             </div>
+
+            <Button
+              type="button"
+              onClick={() => handleGoogleSignUp(navigate)}
+              disabled={loading}
+              className="w-full h-12 bg-zinc-800 hover:bg-zinc-700 text-white text-lg flex items-center justify-center gap-2"
+            >
+              <span className="text-2xl font-bold">G</span>
+              Sign up with Google
+            </Button>
           </div>
 
           <div className="text-lg text-zinc-400">
